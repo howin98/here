@@ -1,10 +1,12 @@
 # here README
 
-here 插件是一个用来快速切换 vscode 编辑器状态的插件。
+here is a vscode extension to switch vscode status smoothly.
 
-通过设置"here.switchConfigurations"数组，here插件可以循环该数组的元素，在工作区层面设置"here.switchConfigurations.settings",并执行"here.switchConfigurations.commands"中的命令。
+through setting "here.switchConfigurations" arr，here extension will set "here.switchConfigurations.settings" and run "here.switchConfigurations.commands" to switch vscode status.
 
-"here.switchConfigurations"的默认配置如下：
+it also support async set and run to make this switch faster.
+
+"here.switchConfigurations" settings for example:
 ```json
 {
   "here.switchConfigurations": [
@@ -29,10 +31,10 @@ here 插件是一个用来快速切换 vscode 编辑器状态的插件。
   ]
 }
 ```
-可以看到在执行here:switch(快捷键： ctrl+alt+h)前后的变化：
-初始状态
-![执行前](img/from.png)
-第一次执行
-![执行后](img/to.png)
-再次执行
-![再次执行](img/redo.png)
+here:switch(key shortcut: ctrl+shift+t):
+before run
+![before run](img/from.png)
+first run
+![first run](img/to.png)
+second run
+![second run](img/redo.png)

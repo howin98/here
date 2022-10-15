@@ -3,8 +3,9 @@
 import * as vscode from 'vscode';
 
 class Configuration {
+	"here.switchConfigurations.async": boolean;
 	"here.switchConfigurations.commands": Array<string> | undefined;
-	"here.switchConfigurations.settings": [key:string] | undefined;
+	"here.switchConfigurations.settings": [key: string] | undefined;
 };
 
 type Configurations = Array<Configuration>;
@@ -15,11 +16,8 @@ class ConfigurationManagement {
 	private index: number;
 	private configs: Configurations | undefined;
 	private constructor() {
-		this.index = 0;
-	}
-
-	private updateConfigs() {
-		this.configs = vscode.workspace.getConfiguration("here").get<Configurations>('switchConfigurations');
+		const index = vscode.workspace.getConfiguration('here').get<number>('index');
+		this.index = index ? index : 0;
 	}
 
 	public static getInstance() {
@@ -29,21 +27,50 @@ class ConfigurationManagement {
 		return ConfigurationManagement.instance;
 	}
 
+	private updateConfigs() {
+		this.configs = vscode.workspace.getConfiguration('here').get<Configurations>('switchConfigurations');
+	}
+
+	private async setIndex() {
+		await vscode.workspace.getConfiguration('here').update('index', this.index);
+	}
+
 	private async updateSettings(config: Configuration) {
-		let settings = config['here.switchConfigurations.settings'];
+		const settings = config['here.switchConfigurations.settings'];
+		const async = config['here.switchConfigurations.async'];
 		if (settings) {
-			for (let key in settings) {
-				let value = settings[key];
-				await vscode.workspace.getConfiguration().update(key, value);
+			if (async) {
+				let arr: Array<Thenable<void>> = [];
+				for (const key in settings) {
+					const value = settings[key];
+					arr.push(vscode.workspace.getConfiguration().update(key, value));
+				}
+				await Promise.all(arr);
+			}
+			else {
+				for (const key in settings) {
+					const value = settings[key];
+					await vscode.workspace.getConfiguration().update(key, value);
+				}
 			}
 		}
 	}
 
 	private async updateCommands(config: Configuration) {
-		let commands = config['here.switchConfigurations.commands'];
+		const commands = config['here.switchConfigurations.commands'];
+		const async = config['here.switchConfigurations.async'];
 		if (commands) {
-			for (let command of commands) {
-				await vscode.commands.executeCommand(command);
+			if (async) {
+				let arr: Array<Thenable<void>> = [];
+				for (const command of commands) {
+					arr.push(vscode.commands.executeCommand(command));
+				}
+				await Promise.all(arr);
+			}
+			else {
+				for (const command of commands) {
+					await vscode.commands.executeCommand(command);
+				}
 			}
 		}
 	}
@@ -55,27 +82,20 @@ class ConfigurationManagement {
 			let config = this.configs[this.index];
 			await this.updateSettings(config);
 			await this.updateCommands(config);
+			await this.setIndex();
 		}
 	}
 }
 
-// This method is called when your extension is activated
-// Your extension is activated the very first time the command is executed
 export function activate(context: vscode.ExtensionContext) {
+	// Initialize instance
+	ConfigurationManagement.getInstance();
 
-	// Use the console to output diagnostic information (console.log) and errors (console.error)
-	// This line of code will only be executed once when your extension is activated
-	console.log('Congratulations, your extension "here" is now active!');
-
-	// The command has been defined in the package.json file
-	// Now provide the implementation of the command with registerCommand
-	// The commandId parameter must match the command field in package.json
+	// Register command
 	let disposable = vscode.commands.registerCommand('here.switch', () => {
 		ConfigurationManagement.getInstance().switch();
 	});
-
 	context.subscriptions.push(disposable);
 }
 
-// This method is called when your extension is deactivated
 export function deactivate() { }

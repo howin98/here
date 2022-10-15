@@ -15,4 +15,11 @@
     "workbench.editor.showTabs": true,
     "breadcrumbs.enabled": true,
     "editor.minimap.enabled": true,
+    "glassit.alpha": 255,
+    "hiWin.properties": {
+        "hinWin.properties.opacity": 255,
+        "hinWin.properties.z-order": "no top most",
+        "hinWin.properties.show": "maximize"
+    },
+    "here.index": 1,
 }

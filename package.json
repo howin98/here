@@ -1,8 +1,8 @@
 {
   "name": "here",
   "displayName": "here",
-  "description": "",
-  "version": "0.0.1",
+  "description": "here is tended to make vscode switching among different status smoothly",
+  "version": "0.0.2",
   "publisher": "howin",
   "engines": {
     "vscode": "^1.72.0"
@@ -22,13 +22,17 @@
     "keybindings": [
       {
         "command": "here.switch",
-        "key": "ctrl+alt+h",
+        "key": "ctrl+shift+t",
         "when": "editorTextFocus"
       }
     ],
     "configuration": {
       "title": "Here",
       "properties": {
+        "here.index": {
+          "type": "integer",
+          "default": 0
+        },
         "here.switchConfigurations": {
           "type": "array",
           "default": [
@@ -56,6 +60,10 @@
             }
           ],
           "properties": {
+            "here.switchConfigurations.async": {
+              "type": "bool",
+              "default": true
+            },
             "here.switchConfigurations.settings": {
               "type": [
                 "array",
@@ -81,7 +89,7 @@
     "commands": [
       {
         "command": "here.switch",
-        "title": "Switch Settings"
+        "title": "here: Switch Settings"
       }
     ]
   },
@@ -94,7 +102,11 @@
     "watch-tests": "tsc -p . -w --outDir out",
     "pretest": "yarn run compile-tests && yarn run compile && yarn run lint",
     "lint": "eslint src --ext ts",
-    "test": "node ./out/test/runTest.js"
+    "test": "node ./out/test/runTest.js",
+    "package-vsix": "vsce package -o here.vsix",
+    "install": "code --install-extension here.vsix",
+    "apply": "yarn package-vsix && yarn install",
+    "push": "git add . && git commit -m fix && git push"
   },
   "devDependencies": {
     "@types/vscode": "^1.72.0",
